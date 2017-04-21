@@ -23,7 +23,7 @@ public class CountRides {
         public KV<LatLon, TableRow> apply(TableRow t) {
             float lat = Float.parseFloat(t.get("latitude").toString());
             float lon = Float.parseFloat(t.get("longitude").toString());
-            final float PRECISION = 0.005f;
+            final float PRECISION = 0.01f;
             float roundedLat = (float) Math.floor(lat / PRECISION) * PRECISION + PRECISION / 2;
             float roundedLon = (float) Math.floor(lon / PRECISION) * PRECISION + PRECISION / 2;
             LatLon key = new LatLon(roundedLat, roundedLon);
@@ -31,7 +31,7 @@ public class CountRides {
         }
     }
 
-    private static class TransformRides extends SimpleFunction<KV<LatLon, Long>, TableRow> {
+    private static class Format extends SimpleFunction<KV<LatLon, Long>, TableRow> {
 
         @Override
         public TableRow apply(KV<LatLon, Long> ridegrp) {
@@ -52,10 +52,10 @@ public class CountRides {
                 .topic(String.format("projects/%s/topics/%s", options.getSourceProject(), options.getSourceTopic()))
                 .timestampLabel("ts")
                 .withCoder(TableRowJsonCoder.of()))
-                .apply("Window (1 second)", Window.into(FixedWindows.of(Duration.standardSeconds(1))))
+                .apply("Window (5 second)", Window.into(FixedWindows.of(Duration.standardSeconds(5))))
                 .apply("Marking", MapElements.via(new Mark()))
                 .apply("Counting related", Count.perKey())
-                .apply("Formatting", MapElements.via(new TransformRides()))
+                .apply("Formatting", MapElements.via(new Format()))
                 .apply(PubsubIO.Write.named("Write ToP ubsub")
                         .topic(String.format("projects/%s/topics/%s", options.getSinkProject(), options.getSinkTopic()))
                         .withCoder(TableRowJsonCoder.of()));
