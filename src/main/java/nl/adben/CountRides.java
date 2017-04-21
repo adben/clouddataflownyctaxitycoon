@@ -56,7 +56,7 @@ public class CountRides {
                 .apply("Marking", MapElements.via(new Mark()))
                 .apply("Counting related", Count.perKey())
                 .apply("Formatting", MapElements.via(new Format()))
-                .apply(PubsubIO.Write.named("Write ToP ubsub")
+                .apply(PubsubIO.Write.named("Write To Pubsub")
                         .topic(String.format("projects/%s/topics/%s", options.getSinkProject(), options.getSinkTopic()))
                         .withCoder(TableRowJsonCoder.of()));
         p.run();
