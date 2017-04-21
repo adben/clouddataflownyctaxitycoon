@@ -8,12 +8,9 @@ import com.google.cloud.dataflow.sdk.options.PipelineOptionsFactory;
 import com.google.cloud.dataflow.sdk.transforms.DoFn;
 import com.google.cloud.dataflow.sdk.transforms.ParDo;
 import nl.adben.utils.CustomPipelineOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class FilterRides {
-    private static final Logger LOG = LoggerFactory.getLogger(FilterRides.class);
 
     private static class FilterSouthManhattan extends DoFn<TableRow, TableRow> {
         FilterSouthManhattan() {
